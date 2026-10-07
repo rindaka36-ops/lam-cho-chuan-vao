@@ -9,24 +9,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Unzip
-        run: |
-          mkdir src_extracted
-          unzip -q SKIBIDI-MERGED-SRCv13-full.zip -d src_extracted
-      - name: Build
-        run: |
-          DIR=$(dirname "$(find src_extracted -maxdepth 3 \( -name pom.xml -o -name build.gradle -o -name build.gradle.kts \) | head -n1)")
-          cd "$DIR"
-          chmod +x gradlew 2>/dev/null || true
-          if [ -f gradlew ]; then ./gradlew build -x test; else gradle build -x test; fi
-      - name: Collect JARs
-        run: |
-          mkdir -p out
-          find src_extracted -path "*/build/libs/*.jar" ! -name "*-sources.jar" ! -name "*-dev.jar" ! -name "*-javadoc.jar" -exec cp {} out/ \;
-          echo "Các file JAR tìm được:"
-          ls -la out/
+      - run: chmod +x gradlew && ./gradlew build -x test
       - uses: actions/upload-artifact@v4
         with:
-          name: mod-jar
-          path: out/*.jar
-          if-no-files-found: error
+          name: jar
+          path: build/libs/*.jar
